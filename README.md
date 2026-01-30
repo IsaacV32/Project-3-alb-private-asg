@@ -14,3 +14,16 @@ Demonstrate how to run scalable, secure workloads on AWS using:
 - modular Terraform design
 
 This project intentionally avoids SSH-based access and is designed to reflect how production environments are typically operated.
+
+## Stage Progress
+
+### Stage 1 — IAM for SSM-only access (Completed)
+Provisioned the IAM components required to manage private EC2 instances via SSM:
+
+- EC2 IAM Role with `AmazonSSMManagedInstanceCore`
+- EC2 Instance Profile attached to the role
+
+Resources created:
+- `aws_iam_role`
+- `aws_iam_instance_profile`
+- `aws_iam_role_policy_attachment`
