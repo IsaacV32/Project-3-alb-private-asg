@@ -92,7 +92,7 @@ resource "aws_security_group_rule" "alb_egress_http_to_app" {
   description = "HTTP to app instances"
 }
 
-# App egress: allow all (we'll tighten later when we add endpoints)
+# App egress: allow all (i will tighten later when we add endpoints)
 resource "aws_security_group_rule" "app_egress_all" {
   type              = "egress"
   security_group_id = aws_security_group.app_sg.id
