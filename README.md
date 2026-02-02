@@ -27,3 +27,6 @@ Resources created:
 - `aws_iam_role`
 - `aws_iam_instance_profile`
 - `aws_iam_role_policy_attachment`
+
+**Stage 2 — Security Groups**  
+In this stage, we defined dedicated security groups for the internal Application Load Balancer and the private application instances. Traffic policies enforce HTTP only from the ALB to the application tier, with no SSH access permitted. Security group rules are managed as separate resources to avoid circular dependencies and align with production-grade Terraform patterns.
