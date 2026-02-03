@@ -15,3 +15,8 @@ variable "vpc_cidr" {
   type        = string
   description = "CIDR of the VPC (e.g. 10.0.0.0/16)"
 }
+
+variable "private_subnet_ids" {
+  type        = list(string)
+  description = "Private subnets for internal ALB (and later ASG)"
+}
