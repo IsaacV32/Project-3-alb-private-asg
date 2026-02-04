@@ -38,8 +38,15 @@ to prepare for integration with an Auto Scaling Group. Resource naming was inten
 kept concise to comply with AWS limits, while descriptive context is preserved through
 tagging.
 
-**Stage 4 — Launch Template (undergoing)**
+**Stage 4 — Launch Template**
 Defined a launch template for private EC2 instances using Amazon Linux 2023. Instances
 are configured without SSH or public IPs and are managed exclusively via AWS Systems
 Manager. User data provisions a lightweight web server and health endpoint to support
 future load balancer integration.
+
+**Stage 5 — Auto Scaling Group**
+An Auto Scaling Group was introduced to run private EC2 instances across multiple
+Availability Zones. Instances are launched using a reusable launch template and
+registered with the internal Application Load Balancer target group. Health checks
+are delegated to the load balancer to enable automatic replacement of unhealthy
+instances and support high availability.
