@@ -31,9 +31,15 @@ Resources created:
 **Stage 2 — Security Groups**  
 In this stage, we defined dedicated security groups for the internal Application Load Balancer and the private application instances. Traffic policies enforce HTTP only from the ALB to the application tier, with no SSH access permitted. Security group rules are managed as separate resources to avoid circular dependencies and align with production-grade Terraform patterns.
 
-**Stage 3 — Internal Application Load Balancer (undergoing)**
+**Stage 3 — Internal Application Load Balancer**
 Introduced an internal Application Load Balancer deployed across private subnets within
 the existing VPC. A target group and HTTP listener were configured with health checks
 to prepare for integration with an Auto Scaling Group. Resource naming was intentionally
 kept concise to comply with AWS limits, while descriptive context is preserved through
 tagging.
+
+**Stage 4 — Launch Template (undergoing)**
+Defined a launch template for private EC2 instances using Amazon Linux 2023. Instances
+are configured without SSH or public IPs and are managed exclusively via AWS Systems
+Manager. User data provisions a lightweight web server and health endpoint to support
+future load balancer integration.
