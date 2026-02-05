@@ -222,3 +222,22 @@ resource "aws_autoscaling_group" "app" {
     propagate_at_launch = true
   }
 }
+
+############################################
+# Stage 6 — Auto Scaling Policy (Target Tracking)
+############################################
+
+resource "aws_autoscaling_policy" "cpu_target_tracking" {
+  name                   = "p3-cpu-target-tracking"
+  autoscaling_group_name = aws_autoscaling_group.app.name
+  policy_type            = "TargetTrackingScaling"
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+
+    target_value     = 50.0
+    disable_scale_in = false
+  }
+}
