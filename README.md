@@ -17,7 +17,7 @@ This project intentionally avoids SSH-based access and is designed to reflect ho
 
 ## Stage Progress
 
-### Stage 1 — IAM for SSM-only access (Completed)
+**Stage 1 — IAM for SSM-only access**
 Provisioned the IAM components required to manage private EC2 instances via SSM:
 
 - EC2 IAM Role with `AmazonSSMManagedInstanceCore`
@@ -56,3 +56,9 @@ Added a target tracking scaling policy to enable automatic scaling based on
 ASG average CPU utilisation. This introduces realistic operational behaviour
 by allowing the fleet to expand and contract in response to load rather than
 running at a fixed capacity.
+
+**Stage 7 — SSM VPC Interface Endpoints**
+Added VPC interface endpoints for Systems Manager (SSM, SSMMessages, and EC2Messages)
+to support private instance management without relying on internet egress or NAT.
+This enables SSM Session Manager connectivity through AWS PrivateLink while keeping
+instances fully private.
