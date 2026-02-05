@@ -50,3 +50,9 @@ Availability Zones. Instances are launched using a reusable launch template and
 registered with the internal Application Load Balancer target group. Health checks
 are delegated to the load balancer to enable automatic replacement of unhealthy
 instances and support high availability.
+
+**Stage 6 — Auto Scaling Policy**
+Added a target tracking scaling policy to enable automatic scaling based on
+ASG average CPU utilisation. This introduces realistic operational behaviour
+by allowing the fleet to expand and contract in response to load rather than
+running at a fixed capacity.
