@@ -32,3 +32,12 @@ output "launch_template_latest_version" {
 output "autoscaling_group_name" {
   value = aws_autoscaling_group.app.name
 }
+
+output "ssm_vpc_endpoints_enabled" {
+  value = var.enable_ssm_endpoints
+}
+
+output "vpce_sg_id" {
+  value       = var.enable_ssm_endpoints ? aws_security_group.vpce_sg[0].id : null
+  description = "Security group ID used by the SSM interface endpoints"
+}

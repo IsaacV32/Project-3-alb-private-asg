@@ -241,3 +241,93 @@ resource "aws_autoscaling_policy" "cpu_target_tracking" {
     disable_scale_in = false
   }
 }
+
+############################################
+# Stage 7 — VPC Interface Endpoints for SSM
+############################################
+
+data "aws_region" "current" {}
+
+locals {
+  ssm_endpoint_subnet_ids = length(var.endpoint_subnet_ids) > 0 ? var.endpoint_subnet_ids : var.private_subnet_ids
+}
+
+# Security group for the endpoints ENIs
+# Allows HTTPS from the app instances to the endpoint interfaces
+resource "aws_security_group" "vpce_sg" {
+  count       = var.enable_ssm_endpoints ? 1 : 0
+  name        = "${var.project_name}-vpce-sg"
+  description = "Security group for VPC interface endpoints (SSM)"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name = "${var.project_name}-vpce-sg"
+  }
+}
+
+resource "aws_security_group_rule" "vpce_ingress_443_from_app" {
+  count                    = var.enable_ssm_endpoints ? 1 : 0
+  type                     = "ingress"
+  security_group_id        = aws_security_group.vpce_sg[0].id
+  source_security_group_id = aws_security_group.app_sg.id
+
+  from_port   = 443
+  to_port     = 443
+  protocol    = "tcp"
+  description = "HTTPS from app instances to VPC endpoints"
+}
+
+# Egress can be left open; endpoints are inside the VPC anyway
+resource "aws_security_group_rule" "vpce_egress_all" {
+  count             = var.enable_ssm_endpoints ? 1 : 0
+  type              = "egress"
+  security_group_id = aws_security_group.vpce_sg[0].id
+
+  from_port   = 0
+  to_port     = 0
+  protocol    = "-1"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Allow all egress"
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  count               = var.enable_ssm_endpoints ? 1 : 0
+  vpc_id              = var.vpc_id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${data.aws_region.current.region}.ssm"
+  subnet_ids          = local.ssm_endpoint_subnet_ids
+  security_group_ids  = [aws_security_group.vpce_sg[0].id]
+  private_dns_enabled = true
+
+  tags = {
+    Name = "${var.project_name}-vpce-ssm"
+  }
+}
+
+resource "aws_vpc_endpoint" "ssmmessages" {
+  count               = var.enable_ssm_endpoints ? 1 : 0
+  vpc_id              = var.vpc_id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${data.aws_region.current.region}.ssmmessages"
+  subnet_ids          = local.ssm_endpoint_subnet_ids
+  security_group_ids  = [aws_security_group.vpce_sg[0].id]
+  private_dns_enabled = true
+
+  tags = {
+    Name = "${var.project_name}-vpce-ssmmessages"
+  }
+}
+
+resource "aws_vpc_endpoint" "ec2messages" {
+  count               = var.enable_ssm_endpoints ? 1 : 0
+  vpc_id              = var.vpc_id
+  vpc_endpoint_type   = "Interface"
+  service_name        = "com.amazonaws.${data.aws_region.current.region}.ec2messages"
+  subnet_ids          = local.ssm_endpoint_subnet_ids
+  security_group_ids  = [aws_security_group.vpce_sg[0].id]
+  private_dns_enabled = true
+
+  tags = {
+    Name = "${var.project_name}-vpce-ec2messages"
+  }
+}
