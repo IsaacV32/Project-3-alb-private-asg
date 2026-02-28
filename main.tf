@@ -37,7 +37,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
   description = "Security group for internal ALB"
-  vpc_id = data.aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
 
   tags = {
     Name = "${var.project_name}-alb-sg"
@@ -47,7 +47,7 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_security_group" "app_sg" {
   name        = "${var.project_name}-app-sg"
   description = "Security group for private app instances (ASG)"
-  vpc_id = data.aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
 
   tags = {
     Name = "${var.project_name}-app-sg"
@@ -115,7 +115,7 @@ resource "aws_lb" "internal" {
   load_balancer_type = "application"
 
   security_groups = [aws_security_group.alb_sg.id]
-  subnets         =  data.aws_subnets.private.ids
+  subnets         = data.aws_subnets.private.ids
 
   tags = {
     Name = "${var.project_name}-alb"
@@ -126,7 +126,7 @@ resource "aws_lb_target_group" "app" {
   name     = "pthree-app-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id = data.aws_vpc.main.id
+  vpc_id   = data.aws_vpc.main.id
 
   health_check {
     enabled             = true
@@ -203,7 +203,7 @@ resource "aws_autoscaling_group" "app" {
   desired_capacity = 2
   max_size         = 4
 
-  vpc_zone_identifier       =  data.aws_subnets.private.ids
+  vpc_zone_identifier       = data.aws_subnets.private.ids
   health_check_type         = "ELB"
   health_check_grace_period = 60
 
@@ -258,7 +258,7 @@ resource "aws_security_group" "vpce_sg" {
   count       = var.enable_ssm_endpoints ? 1 : 0
   name        = "${var.project_name}-vpce-sg"
   description = "Security group for VPC interface endpoints (SSM)"
-  vpc_id = data.aws_vpc.main.id
+  vpc_id      = data.aws_vpc.main.id
 
   tags = {
     Name = "${var.project_name}-vpce-sg"
