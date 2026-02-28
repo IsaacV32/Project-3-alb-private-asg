@@ -7,18 +7,15 @@ variable "project_name" {
   type    = string
   default = "project-3-private-alb-asg-ssm"
 }
-variable "vpc_id" {
-  type = string
+
+variable "vpc_project_name" {
+  type    = string
+  default = "aws-vpc-terraform"
 }
 
-variable "vpc_cidr" {
-  type        = string
-  description = "CIDR of the VPC (e.g. 10.0.0.0/16)"
-}
-
-variable "private_subnet_ids" {
-  type        = list(string)
-  description = "Private subnets for internal ALB (and later ASG)"
+variable "environment" {
+  type    = string
+  default = "dev"
 }
 
 variable "enable_ssm_endpoints" {

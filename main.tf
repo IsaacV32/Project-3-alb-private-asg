@@ -37,7 +37,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project_name}-alb-sg"
   description = "Security group for internal ALB"
-  vpc_id      = var.vpc_id
+  vpc_id = data.aws_vpc.main.id
 
   tags = {
     Name = "${var.project_name}-alb-sg"
@@ -47,7 +47,7 @@ resource "aws_security_group" "alb_sg" {
 resource "aws_security_group" "app_sg" {
   name        = "${var.project_name}-app-sg"
   description = "Security group for private app instances (ASG)"
-  vpc_id      = var.vpc_id
+  vpc_id = data.aws_vpc.main.id
 
   tags = {
     Name = "${var.project_name}-app-sg"
@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "alb_ingress_http_from_vpc" {
   from_port   = 80
   to_port     = 80
   protocol    = "tcp"
-  cidr_blocks = [var.vpc_cidr]
+  cidr_blocks = [data.aws_vpc.main.cidr_block]
 
   description = "HTTP from inside the VPC"
 }
@@ -115,7 +115,7 @@ resource "aws_lb" "internal" {
   load_balancer_type = "application"
 
   security_groups = [aws_security_group.alb_sg.id]
-  subnets         = var.private_subnet_ids
+  subnets         =  data.aws_subnets.private.ids
 
   tags = {
     Name = "${var.project_name}-alb"
@@ -126,7 +126,7 @@ resource "aws_lb_target_group" "app" {
   name     = "pthree-app-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  vpc_id = data.aws_vpc.main.id
 
   health_check {
     enabled             = true
@@ -203,7 +203,7 @@ resource "aws_autoscaling_group" "app" {
   desired_capacity = 2
   max_size         = 4
 
-  vpc_zone_identifier       = var.private_subnet_ids
+  vpc_zone_identifier       =  data.aws_subnets.private.ids
   health_check_type         = "ELB"
   health_check_grace_period = 60
 
@@ -249,7 +249,7 @@ resource "aws_autoscaling_policy" "cpu_target_tracking" {
 data "aws_region" "current" {}
 
 locals {
-  ssm_endpoint_subnet_ids = length(var.endpoint_subnet_ids) > 0 ? var.endpoint_subnet_ids : var.private_subnet_ids
+  ssm_endpoint_subnet_ids = length(var.endpoint_subnet_ids) > 0 ? var.endpoint_subnet_ids : data.aws_subnets.private.ids
 }
 
 # Security group for the endpoints ENIs
@@ -258,7 +258,7 @@ resource "aws_security_group" "vpce_sg" {
   count       = var.enable_ssm_endpoints ? 1 : 0
   name        = "${var.project_name}-vpce-sg"
   description = "Security group for VPC interface endpoints (SSM)"
-  vpc_id      = var.vpc_id
+  vpc_id = data.aws_vpc.main.id
 
   tags = {
     Name = "${var.project_name}-vpce-sg"
@@ -292,7 +292,7 @@ resource "aws_security_group_rule" "vpce_egress_all" {
 
 resource "aws_vpc_endpoint" "ssm" {
   count               = var.enable_ssm_endpoints ? 1 : 0
-  vpc_id              = var.vpc_id
+  vpc_id              = data.aws_vpc.main.id
   vpc_endpoint_type   = "Interface"
   service_name        = "com.amazonaws.${data.aws_region.current.region}.ssm"
   subnet_ids          = local.ssm_endpoint_subnet_ids
@@ -306,7 +306,7 @@ resource "aws_vpc_endpoint" "ssm" {
 
 resource "aws_vpc_endpoint" "ssmmessages" {
   count               = var.enable_ssm_endpoints ? 1 : 0
-  vpc_id              = var.vpc_id
+  vpc_id              = data.aws_vpc.main.id
   vpc_endpoint_type   = "Interface"
   service_name        = "com.amazonaws.${data.aws_region.current.region}.ssmmessages"
   subnet_ids          = local.ssm_endpoint_subnet_ids
@@ -320,7 +320,7 @@ resource "aws_vpc_endpoint" "ssmmessages" {
 
 resource "aws_vpc_endpoint" "ec2messages" {
   count               = var.enable_ssm_endpoints ? 1 : 0
-  vpc_id              = var.vpc_id
+  vpc_id              = data.aws_vpc.main.id
   vpc_endpoint_type   = "Interface"
   service_name        = "com.amazonaws.${data.aws_region.current.region}.ec2messages"
   subnet_ids          = local.ssm_endpoint_subnet_ids
