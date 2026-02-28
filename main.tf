@@ -277,7 +277,7 @@ resource "aws_security_group_rule" "vpce_ingress_443_from_app" {
   description = "HTTPS from app instances to VPC endpoints"
 }
 
-# Egress can be left open; endpoints are inside the VPC anyway
+# Egress can be left open;: endpoints are inside the VPC anyway
 resource "aws_security_group_rule" "vpce_egress_all" {
   count             = var.enable_ssm_endpoints ? 1 : 0
   type              = "egress"
