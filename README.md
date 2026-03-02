@@ -62,3 +62,13 @@ Added VPC interface endpoints for Systems Manager (SSM, SSMMessages, and EC2Mess
 to support private instance management without relying on internet egress or NAT.
 This enables SSM Session Manager connectivity through AWS PrivateLink while keeping
 instances fully private.
+
+## CI/CD + Remote State
+
+This repository uses GitHub Actions to deploy infrastructure using Terraform with **OIDC federation to AWS** (no static AWS credentials).
+
+- **Plan** runs on Pull Requests
+- **Apply** runs manually (workflow_dispatch) for controlled releases
+- Terraform state is stored remotely in **S3** with **DynamoDB state locking**
+
+This ensures both local development and CI/CD share a single source of truth for infrastructure state.
